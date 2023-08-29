@@ -1,0 +1,17 @@
+plugins {
+    id 'groovy-gradle-plugin'
+    id 'java-gradle-plugin'
+}
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+    gradlePluginPortal()
+}
+dependencies {
+    implementation 'io.freefair.gradle:lombok-plugin:8.11'
+    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.4.1'
+    implementation 'io.spring.gradle:dependency-management-plugin:1.1.7'
+    implementation "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin:2.0.0"
+}
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}

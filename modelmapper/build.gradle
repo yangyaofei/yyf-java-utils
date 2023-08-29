@@ -1,0 +1,10 @@
+plugins {
+    id 'java-conventions'
+}
+
+dependencies {
+    implementation "org.modelmapper:modelmapper:${Versions.modelMapperVersion}"
+    implementation "org.modelmapper:modelmapper-module-record:${Versions.modelMapperModuleRecordVersion}"
+    implementation "com.google.guava:guava:${Versions.googleGuava}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${Versions.junitVersion}"
+}

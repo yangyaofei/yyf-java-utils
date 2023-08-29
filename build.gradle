@@ -1,0 +1,79 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'java-library'
+    // for lombok
+    id "io.freefair.lombok"
+    id 'maven-publish'
+    id 'signing'
+    id "io.github.gradle-nexus.publish-plugin"
+}
+allprojects {
+    group = 'io.github.yangyaofei'
+    version = '0.1.0rc2'
+}
+
+subprojects {
+    apply {
+        plugin 'signing'
+        plugin 'java'
+        plugin 'maven-publish'
+        plugin 'java-library'
+    }
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId = group
+                artifactId = "${rootProject.getName()}-${project.getName()}"
+                version = version
+                from components.java
+
+                versionMapping {
+                    usage("java-runtime") {
+                        fromResolutionResult()
+                    }
+                }
+                pom {
+                    name.set("${rootProject.name}-${project.name}")
+                    description.set("Self-used java utils library.")
+                    url.set("https://github.com/yangyaofei/yyf-java-utils")
+                    licenses {
+                        license {
+                            name.set("GNU General Public License, version 3 (GPLv3)")
+                            url.set("https://www.gnu.org/licenses/gpl-3.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("yangyaofei")
+                            name.set("Yang Yaofei")
+                        }
+                    }
+                    scm {
+                        url.set("https://github.com/yangyaofei/yyf-java-utils")
+                    }
+                }
+            }
+        }
+    }
+    signing {
+        def asciiKey = System.getenv('SIGNING_KEY')
+        def asciiPassword = System.getenv('SIGNING_PASSWORD')
+
+        if (asciiKey && asciiPassword) {
+            useInMemoryPgpKeys(asciiKey, asciiPassword)
+        }
+        sign publishing.publications.maven
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username = System.getenv('OSSRH_USERNAME')
+            password = System.getenv('OSSRH_TOKEN')
+        }
+    }
+}

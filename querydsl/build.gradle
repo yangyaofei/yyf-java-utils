@@ -1,0 +1,7 @@
+plugins {
+    id 'java-conventions'
+    id 'spring-dependency-conventions'
+}
+dependencies {
+    implementation "io.github.perplexhub:rsql-querydsl:${Versions.rsqlVersion}"
+}

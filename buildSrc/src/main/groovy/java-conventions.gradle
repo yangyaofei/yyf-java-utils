@@ -1,0 +1,43 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'java-library'
+    // for lombok
+    id "io.freefair.lombok"
+}
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    mavenCentral()
+    mavenLocal()
+}
+def lombokVersion = '1.18.32'
+
+dependencies {
+    // lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
+tasks.findAll { task ->
+    {
+        if (task.hasProperty('options.encoding')) {
+            task.options.encoding = "UTF-8"
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+    withJavadocJar()
+}
+
+idea.module {
+    downloadJavadoc = true
+    downloadSources = true
+}

@@ -1,0 +1,10 @@
+rootProject.name = 'yyf-java-utils'
+include 'grpc'
+include 'jackson'
+include 'modelmapper'
+include 'spring'
+include 'crypto'
+include 'springdoc'
+include 'querydsl'
+include 'exception'
+

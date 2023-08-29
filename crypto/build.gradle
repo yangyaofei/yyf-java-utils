@@ -1,0 +1,11 @@
+plugins {
+    id 'java-conventions'
+}
+
+dependencies {
+    implementation "org.bouncycastle:${Versions.bouncycastleVersion}"
+    implementation "commons-io:commons-io:${Versions.commonsIoVersion}"
+    implementation "commons-codec:commons-codec:${Versions.commonsCodecVersion}"
+    implementation "org.apache.commons:commons-lang3:${Versions.commonsLangVersion}"
+    implementation "com.google.code.findbugs:jsr305:${Versions.googleJsr305}"
+}

@@ -1,0 +1,8 @@
+plugins {
+    id 'java-conventions'
+    id 'spring-dependency-conventions'
+}
+
+dependencies {
+    api 'com.fasterxml.jackson.core:jackson-databind'
+}
