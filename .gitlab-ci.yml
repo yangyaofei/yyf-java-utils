@@ -1,0 +1,27 @@
+image: docker:20.10.6-dind
+
+stages:
+  - publish
+
+cache:
+  key: gradle
+  paths:
+    - .gradle
+    - cache/caches/
+    - cache/notifications/
+    - cache/wrapper/
+
+variables:
+  MAVEN_REPO: /cache/.m2
+  GRADLE_USER_HOME: /cache/.gradle
+
+publish:
+  stage: publish
+  image: openjdk:17-jdk
+  script:
+    - |
+      ./gradlew clean --info && \
+      ./gradlew build -x test --info && \
+      ./gradlew publish --info
+  only:
+    - tags

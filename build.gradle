@@ -1,0 +1,92 @@
+plugins {
+    id 'idea'
+    id 'java'
+    // for lombok
+    id "io.freefair.lombok" version "8.0.1"
+    id 'maven-publish'
+}
+
+allprojects {
+    group = 'com.lingjoin'
+    version = '0.1.0'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = rootProject.getName()
+            version = version
+            from components.java
+        }
+
+    }
+    // TODO
+//    repositories {
+//        maven {
+//            url "https://git.lingjoin.com/api/v4/projects/4/packages/maven"
+//            name "nlpir-platform-repo"
+//            credentials(HttpHeaderCredentials) {
+//                name = 'Job-Token'
+//                value = System.getenv("CI_JOB_TOKEN")
+//            }
+//            authentication {
+//                header(HttpHeaderAuthentication)
+//            }
+//        }
+//    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/repository/public' }
+
+}
+def grpcVersion = '1.55.1'
+def lombokVersion = '1.18.26'
+
+dependencies {
+
+
+    // spring data and jpa related package
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    // lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    // For springboot 3.1.3
+    // jackson https://docs.spring.io/spring-boot/docs/3.1.3/reference/htmlsingle/#appendix.dependency-versions.coordinates
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+    implementation 'org.modelmapper:modelmapper-module-record:1.0.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+tasks.findAll { task ->
+    {
+        if (task.hasProperty('options.encoding')) {
+            task.options.encoding = "UTF-8"
+        }
+    }
+}
+
+java {
+    sourceCompatibility = 17
+    targetCompatibility = 17
+    withSourcesJar()
+    withJavadocJar()
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
