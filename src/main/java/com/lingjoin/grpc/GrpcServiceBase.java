@@ -70,7 +70,7 @@ abstract public class GrpcServiceBase {
      * @return the channel credentials
      * @throws IOException the io exception
      */
-    protected ChannelCredentials generateCredentials() throws IOException {
+    private ChannelCredentials generateCredentials() throws IOException {
         if (this.grpcConfig.getEnableTls()) {
             return TlsChannelCredentials.newBuilder()
                     .keyManager(new File(getGrpcConfig().getCertChainPath()), new File(getGrpcConfig().getPrivateKeyPath()))
@@ -87,7 +87,7 @@ abstract public class GrpcServiceBase {
      * @param endpoint the endpoint
      * @return the managed channel
      */
-    protected ManagedChannel generateChannel(GrpcEndpoint endpoint) {
+    private ManagedChannel generateChannel(GrpcEndpoint endpoint) {
         return Grpc.newChannelBuilderForAddress(endpoint.getHost(), endpoint.getPort(), getTlsCredentials())
                 .maxInboundMessageSize(Integer.MAX_VALUE)
                 .build();
