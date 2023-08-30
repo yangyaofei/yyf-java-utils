@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     group = 'com.lingjoin'
-    version = '0.1.0b1'
+    version = '0.1.0'
 }
 
 publishing {
@@ -21,20 +21,19 @@ publishing {
         }
 
     }
-    // TODO
-//    repositories {
-//        maven {
-//            url "https://git.lingjoin.com/api/v4/projects/4/packages/maven"
-//            name "nlpir-platform-repo"
-//            credentials(HttpHeaderCredentials) {
-//                name = 'Job-Token'
-//                value = System.getenv("CI_JOB_TOKEN")
-//            }
-//            authentication {
-//                header(HttpHeaderAuthentication)
-//            }
-//        }
-//    }
+    repositories {
+        maven {
+            url "https://git.lingjoin.com/api/v4/projects/57/packages/maven"
+            name "nlpir-platform-repo"
+            credentials(HttpHeaderCredentials) {
+                name = 'Job-Token'
+                value = System.getenv("CI_JOB_TOKEN")
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+    }
 }
 
 repositories {
