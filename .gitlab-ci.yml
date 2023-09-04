@@ -17,7 +17,7 @@ variables:
 
 publish:
   stage: publish
-  image: openjdk:17-jdk
+  image: eclipse-temurin:17-jdk-focal
   script:
     - |
       ./gradlew clean --info && \

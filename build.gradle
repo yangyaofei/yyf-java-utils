@@ -2,7 +2,7 @@ plugins {
     id 'idea'
     id 'java'
     // for lombok
-    id "io.freefair.lombok" version "8.0.1"
+    id "io.freefair.lombok" version "8.3"
     id 'maven-publish'
 }
 
@@ -37,19 +37,14 @@ publishing {
 }
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
     mavenLocal()
-    maven { url 'https://maven.aliyun.com/repository/public' }
-
 }
 def grpcVersion = '1.55.1'
 def lombokVersion = '1.18.26'
 
 dependencies {
-
-
-    // spring data and jpa related package
-    implementation 'org.modelmapper:modelmapper:3.1.1'
 
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     // lombok
