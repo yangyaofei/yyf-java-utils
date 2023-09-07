@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 @Converter
 @Component
 public class JsonConverter<T> implements AttributeConverter<T, String> {
+    @SuppressWarnings("MissingJavadoc")
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
