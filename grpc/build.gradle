@@ -1,0 +1,9 @@
+plugins {
+    id 'java-conventions'
+}
+
+def grpcVersion = '1.55.1'
+
+dependencies {
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+}

@@ -1,0 +1,11 @@
+plugins {
+//    id 'groovy'
+    id 'groovy-gradle-plugin'
+    id 'java-gradle-plugin'
+}
+repositories {
+    gradlePluginPortal()
+}
+dependencies {
+    implementation 'io.freefair.gradle:lombok-plugin:8.3'
+}

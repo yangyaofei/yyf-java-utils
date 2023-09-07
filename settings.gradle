@@ -1,2 +1,7 @@
 rootProject.name = 'nlpir-platform-utils'
+include 'grpc'
+include 'jackson'
+include 'modelmapper'
+include 'build-conventions'
+include 'spring'
 
