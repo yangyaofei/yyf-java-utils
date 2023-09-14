@@ -4,4 +4,4 @@ include 'jackson'
 include 'modelmapper'
 include 'build-conventions'
 include 'spring'
-
+include 'crypto'
