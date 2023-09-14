@@ -1,0 +1,12 @@
+plugins {
+	id 'java-conventions'
+	id 'groovy-gradle-plugin'
+}
+
+
+dependencies {
+	implementation 'org.bouncycastle:bcpkix-jdk15on:1.64'
+	implementation 'commons-io:commons-io:2.11.0'
+	implementation 'commons-codec:commons-codec:1.15'
+	implementation 'org.apache.commons:commons-lang3:3.13.0'
+}
