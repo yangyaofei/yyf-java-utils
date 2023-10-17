@@ -1,11 +1,11 @@
 plugins {
-	id 'java-conventions'
-	id 'groovy-gradle-plugin'
+    id 'java-conventions'
 }
 
 dependencies {
-	implementation 'org.bouncycastle:bcpkix-jdk18on:1.76'
-	implementation 'commons-io:commons-io:2.11.0'
-	implementation 'commons-codec:commons-codec:1.15'
-	implementation 'org.apache.commons:commons-lang3:3.13.0'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.76'
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
