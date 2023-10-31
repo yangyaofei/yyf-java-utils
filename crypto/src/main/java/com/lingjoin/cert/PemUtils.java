@@ -7,10 +7,6 @@
 
 package com.lingjoin.cert;
 
-//import org.elasticsearch.common.hash.MessageDigests;
-//import org.elasticsearch.core.CharArrays;
-//import org.elasticsearch.jdk.JavaVersion;
-
 import lombok.SneakyThrows;
 
 import javax.crypto.Cipher;
@@ -37,6 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Pem utils.
+ */
+@SuppressWarnings("unused")
 public class PemUtils {
 
     private static final String PKCS1_HEADER = "-----BEGIN RSA PRIVATE KEY-----";
@@ -66,9 +66,10 @@ public class PemUtils {
      * Creates a {@link PrivateKey} from the contents of a file. Supports PKCS#1, PKCS#8
      * encoded formats of encrypted and plaintext RSA, DSA and EC(secp256r1) keys
      *
-     * @param keyPath           the path for the key file
+     * @param keyPath          the path for the key file
      * @param passwordSupplier A password supplier for the potentially encrypted (password protected) key
      * @return a private key from the contents of the file
+     * @throws IOException if the file can't be read
      */
     public static PrivateKey readPrivateKey(Path keyPath, Supplier<char[]> passwordSupplier) throws IOException {
         try (BufferedReader bReader = Files.newBufferedReader(keyPath, StandardCharsets.UTF_8)) {
@@ -79,29 +80,24 @@ public class PemUtils {
             if (null == line) {
                 throw new IllegalStateException("Error parsing Private Key from: " + keyPath.toString() + ". File is empty");
             }
-            if (PKCS8_ENCRYPTED_HEADER.equals(line.trim())) {
-                char[] password = passwordSupplier.get();
-                if (password == null) {
-                    throw new IllegalArgumentException("cannot read encrypted key without a password");
+            return switch (line.trim()) {
+                case PKCS8_ENCRYPTED_HEADER -> {
+                    char[] password = passwordSupplier.get();
+                    if (password == null) {
+                        throw new IllegalArgumentException("cannot read encrypted key without a password");
+                    }
+                    yield parsePKCS8Encrypted(bReader, password);
                 }
-                return parsePKCS8Encrypted(bReader, password);
-            } else if (PKCS8_HEADER.equals(line.trim())) {
-                return parsePKCS8(bReader);
-            } else if (PKCS1_HEADER.equals(line.trim())) {
-                return parsePKCS1Rsa(bReader, passwordSupplier);
-            } else if (OPENSSL_DSA_HEADER.equals(line.trim())) {
-                return parseOpenSslDsa(bReader, passwordSupplier);
-            } else if (OPENSSL_DSA_PARAMS_HEADER.equals(line.trim())) {
-                return parseOpenSslDsa(removeDsaHeaders(bReader), passwordSupplier);
-            } else if (OPENSSL_EC_HEADER.equals(line.trim())) {
-                return parseOpenSslEC(bReader, passwordSupplier);
-            } else if (OPENSSL_EC_PARAMS_HEADER.equals(line.trim())) {
-                return parseOpenSslEC(removeECHeaders(bReader), passwordSupplier);
-            } else {
-                throw new IllegalStateException(
-                    "Error parsing Private Key from: " + keyPath.toString() + ". File did not contain a " + "supported key format"
+                case PKCS8_HEADER -> parsePKCS8(bReader);
+                case PKCS1_HEADER -> parsePKCS1Rsa(bReader, passwordSupplier);
+                case OPENSSL_DSA_HEADER -> parseOpenSslDsa(bReader, passwordSupplier);
+                case OPENSSL_DSA_PARAMS_HEADER -> parseOpenSslDsa(removeDsaHeaders(bReader), passwordSupplier);
+                case OPENSSL_EC_HEADER -> parseOpenSslEC(bReader, passwordSupplier);
+                case OPENSSL_EC_PARAMS_HEADER -> parseOpenSslEC(removeECHeaders(bReader), passwordSupplier);
+                default -> throw new IllegalStateException(
+                        "Error parsing Private Key from: " + keyPath.toString() + ". File did not contain a " + "supported key format"
                 );
-            }
+            };
         } catch (GeneralSecurityException e) {
             throw new IllegalStateException("Error parsing Private Key from: " + keyPath.toString(), e);
         }
@@ -194,7 +190,7 @@ public class PemUtils {
      * @throws GeneralSecurityException if the private key can't be generated from the {@link ECPrivateKeySpec}
      */
     private static PrivateKey parseOpenSslEC(BufferedReader bReader, Supplier<char[]> passwordSupplier) throws IOException,
-        GeneralSecurityException {
+            GeneralSecurityException {
         StringBuilder sb = new StringBuilder();
         String line = bReader.readLine();
         Map<String, String> pemHeaders = new HashMap<>();
@@ -231,7 +227,7 @@ public class PemUtils {
      * @throws GeneralSecurityException if the private key can't be generated from the {@link RSAPrivateCrtKeySpec}
      */
     private static PrivateKey parsePKCS1Rsa(BufferedReader bReader, Supplier<char[]> passwordSupplier) throws IOException,
-        GeneralSecurityException {
+            GeneralSecurityException {
         StringBuilder sb = new StringBuilder();
         String line = bReader.readLine();
         Map<String, String> pemHeaders = new HashMap<>();
@@ -270,7 +266,7 @@ public class PemUtils {
      * @throws GeneralSecurityException if the private key can't be generated from the {@link DSAPrivateKeySpec}
      */
     private static PrivateKey parseOpenSslDsa(BufferedReader bReader, Supplier<char[]> passwordSupplier) throws IOException,
-        GeneralSecurityException {
+            GeneralSecurityException {
         StringBuilder sb = new StringBuilder();
         String line = bReader.readLine();
         Map<String, String> pemHeaders = new HashMap<>();
@@ -360,11 +356,11 @@ public class PemUtils {
                 if (!encryptionId.startsWith(AES_OID)) {
                     final String name = getAlgorithmNameFromOid(encryptionId);
                     throw new GeneralSecurityException(
-                        "PKCS#8 Private Key is encrypted with unsupported PBES2 algorithm ["
-                            + encryptionId
-                            + "]"
-                            + (name == null ? "" : " (" + name + ")"),
-                        e
+                            "PKCS#8 Private Key is encrypted with unsupported PBES2 algorithm ["
+                                    + encryptionId
+                                    + "]"
+                                    + (name == null ? "" : " (" + name + ")"),
+                            e
                     );
                 }
                 /*if (JavaVersion.current().compareTo(JavaVersion.parse("11.0.0")) < 0) {
@@ -385,6 +381,7 @@ public class PemUtils {
 
     /**
      * This is horrible, but it's the only option other than to parse the encoded ASN.1 value ourselves
+     *
      * @see AlgorithmParameters#toString() and com.sun.crypto.provider.PBES2Parameters#toString()
      */
     private static String getPBES2Algorithm(EncryptedPrivateKeyInfo encryptedPrivateKeyInfo) {
@@ -409,7 +406,7 @@ public class PemUtils {
      * @throws IOException              if the PEM headers are missing or malformed
      */
     private static byte[] possiblyDecryptPKCS1Key(Map<String, String> pemHeaders, String keyContents, Supplier<char[]> passwordSupplier)
-        throws GeneralSecurityException, IOException {
+            throws GeneralSecurityException, IOException {
         byte[] keyBytes = Base64.getDecoder().decode(keyContents);
         String procType = pemHeaders.get("Proc-Type");
         if ("4,ENCRYPTED".equals(procType)) {
@@ -439,8 +436,8 @@ public class PemUtils {
      * @param password       The password with which the key is encrypted
      * @return a cipher of the appropriate algorithm and parameters to be used for decryption
      * @throws GeneralSecurityException if the algorithm is not available in the used security provider, or if the key is inappropriate
-     * for the cipher
-     * @throws IOException if the DEK-Info PEM header is invalid
+     *                                  for the cipher
+     * @throws IOException              if the DEK-Info PEM header is invalid
      */
     private static Cipher getCipherFromParameters(String dekHeaderValue, char[] password) throws GeneralSecurityException, IOException {
         String padding = "PKCS5Padding";
@@ -481,6 +478,11 @@ public class PemUtils {
      * that uses n rounds of salted MD5 (as many times as needed to get the necessary number of key bytes)
      * <p>
      * https://www.openssl.org/docs/man1.1.0/crypto/PEM_write_bio_PrivateKey_traditional.html
+     *
+     * @param password The password to use for key stretching.
+     * @param salt     The salt to use for key stretching.
+     * @param keyLength The desired length of the key in bytes.
+     * @return The generated key.
      */
     @SneakyThrows
     private static byte[] generateOpenSslKey(char[] password, byte[] salt, int keyLength) {
@@ -600,7 +602,7 @@ public class PemUtils {
      * @param keyBytes the private key raw bytes
      * @return A string identifier for the key algorithm (RSA, DSA, or EC)
      * @throws GeneralSecurityException if the algorithm oid that is parsed from ASN.1 is unknown
-     * @throws IOException if the DER encoded key can't be parsed
+     * @throws IOException              if the DER encoded key can't be parsed
      */
     private static String getKeyAlgorithmIdentifier(byte[] keyBytes) throws IOException, GeneralSecurityException {
         DerParser parser = new DerParser(keyBytes);
@@ -619,105 +621,73 @@ public class PemUtils {
                 return "EC";
         }
         throw new GeneralSecurityException(
-            "Error parsing key algorithm identifier. Algorithm with OID: " + oidString + " is not " + "supported"
+                "Error parsing key algorithm identifier. Algorithm with OID: " + oidString + " is not " + "supported"
         );
     }
 
     private static String getAlgorithmNameFromOid(String oidString) throws GeneralSecurityException {
-        switch (oidString) {
-            case "1.2.840.10040.4.1":
-                return "DSA";
-            case "1.2.840.113549.1.1.1":
-                return "RSA";
-            case "1.2.840.10045.2.1":
-                return "EC";
-            case "1.3.14.3.2.7":
-                return "DES-CBC";
-            case "2.16.840.1.101.3.4.1.1":
-                return "AES-128_ECB";
-            case "2.16.840.1.101.3.4.1.2":
-                return "AES-128_CBC";
-            case "2.16.840.1.101.3.4.1.3":
-                return "AES-128_OFB";
-            case "2.16.840.1.101.3.4.1.4":
-                return "AES-128_CFB";
-            case "2.16.840.1.101.3.4.1.6":
-                return "AES-128_GCM";
-            case "2.16.840.1.101.3.4.1.21":
-                return "AES-192_ECB";
-            case "2.16.840.1.101.3.4.1.22":
-                return "AES-192_CBC";
-            case "2.16.840.1.101.3.4.1.23":
-                return "AES-192_OFB";
-            case "2.16.840.1.101.3.4.1.24":
-                return "AES-192_CFB";
-            case "2.16.840.1.101.3.4.1.26":
-                return "AES-192_GCM";
-            case "2.16.840.1.101.3.4.1.41":
-                return "AES-256_ECB";
-            case "2.16.840.1.101.3.4.1.42":
-                return "AES-256_CBC";
-            case "2.16.840.1.101.3.4.1.43":
-                return "AES-256_OFB";
-            case "2.16.840.1.101.3.4.1.44":
-                return "AES-256_CFB";
-            case "2.16.840.1.101.3.4.1.46":
-                return "AES-256_GCM";
-            case "2.16.840.1.101.3.4.1.5":
-                return "AESWrap-128";
-            case "2.16.840.1.101.3.4.1.25":
-                return "AESWrap-192";
-            case "2.16.840.1.101.3.4.1.45":
-                return "AESWrap-256";
-        }
-        return null;
+        return switch (oidString) {
+            case "1.2.840.10040.4.1" -> "DSA";
+            case "1.2.840.113549.1.1.1" -> "RSA";
+            case "1.2.840.10045.2.1" -> "EC";
+            case "1.3.14.3.2.7" -> "DES-CBC";
+            case "2.16.840.1.101.3.4.1.1" -> "AES-128_ECB";
+            case "2.16.840.1.101.3.4.1.2" -> "AES-128_CBC";
+            case "2.16.840.1.101.3.4.1.3" -> "AES-128_OFB";
+            case "2.16.840.1.101.3.4.1.4" -> "AES-128_CFB";
+            case "2.16.840.1.101.3.4.1.6" -> "AES-128_GCM";
+            case "2.16.840.1.101.3.4.1.21" -> "AES-192_ECB";
+            case "2.16.840.1.101.3.4.1.22" -> "AES-192_CBC";
+            case "2.16.840.1.101.3.4.1.23" -> "AES-192_OFB";
+            case "2.16.840.1.101.3.4.1.24" -> "AES-192_CFB";
+            case "2.16.840.1.101.3.4.1.26" -> "AES-192_GCM";
+            case "2.16.840.1.101.3.4.1.41" -> "AES-256_ECB";
+            case "2.16.840.1.101.3.4.1.42" -> "AES-256_CBC";
+            case "2.16.840.1.101.3.4.1.43" -> "AES-256_OFB";
+            case "2.16.840.1.101.3.4.1.44" -> "AES-256_CFB";
+            case "2.16.840.1.101.3.4.1.46" -> "AES-256_GCM";
+            case "2.16.840.1.101.3.4.1.5" -> "AESWrap-128";
+            case "2.16.840.1.101.3.4.1.25" -> "AESWrap-192";
+            case "2.16.840.1.101.3.4.1.45" -> "AESWrap-256";
+            default -> null;
+        };
     }
 
     private static String getEcCurveNameFromOid(String oidString) throws GeneralSecurityException {
-        switch (oidString) {
+        return switch (oidString) {
             // see https://tools.ietf.org/html/rfc5480#section-2.1.1.1
-            case "1.2.840.10045.3.1":
-                return "secp192r1";
-            case "1.3.132.0.1":
-                return "sect163k1";
-            case "1.3.132.0.15":
-                return "sect163r2";
-            case "1.3.132.0.33":
-                return "secp224r1";
-            case "1.3.132.0.26":
-                return "sect233k1";
-            case "1.3.132.0.27":
-                return "sect233r1";
-            case "1.2.840.10045.3.1.7":
-                return "secp256r1";
-            case "1.3.132.0.16":
-                return "sect283k1";
-            case "1.3.132.0.17":
-                return "sect283r1";
-            case "1.3.132.0.34":
-                return "secp384r1";
-            case "1.3.132.0.36":
-                return "sect409k1";
-            case "1.3.132.0.37":
-                return "sect409r1";
-            case "1.3.132.0.35":
-                return "secp521r1";
-            case "1.3.132.0.38":
-                return "sect571k1";
-            case "1.3.132.0.39":
-                return "sect571r1";
-        }
-        throw new GeneralSecurityException(
-            "Error parsing EC named curve identifier. Named curve with OID: " + oidString + " is not " + "supported"
-        );
+            case "1.2.840.10045.3.1" -> "secp192r1";
+            case "1.3.132.0.1" -> "sect163k1";
+            case "1.3.132.0.15" -> "sect163r2";
+            case "1.3.132.0.33" -> "secp224r1";
+            case "1.3.132.0.26" -> "sect233k1";
+            case "1.3.132.0.27" -> "sect233r1";
+            case "1.2.840.10045.3.1.7" -> "secp256r1";
+            case "1.3.132.0.16" -> "sect283k1";
+            case "1.3.132.0.17" -> "sect283r1";
+            case "1.3.132.0.34" -> "secp384r1";
+            case "1.3.132.0.36" -> "sect409k1";
+            case "1.3.132.0.37" -> "sect409r1";
+            case "1.3.132.0.35" -> "secp521r1";
+            case "1.3.132.0.38" -> "sect571k1";
+            case "1.3.132.0.39" -> "sect571r1";
+            default -> throw new GeneralSecurityException(
+                    "Error parsing EC named curve identifier. Named curve with OID: " + oidString + " is not " + "supported"
+            );
+        };
+
     }
 
 
     /**
-     * From <a href="https://github.com/elastic/elasticsearch/blob/a8cf4d6006c912af97c1407ff0406bc4a9a9659c/libs/core/src/main/java/org/elasticsearch/core/CharArrays.java#L20">...</a>
      * Encodes the provided char[] to a UTF-8 byte[]. This is done while avoiding
      * conversions to String. The provided char[] is not modified by this method, so
      * the caller needs to take care of clearing the value if it is sensitive.
+     * <p>
+     * From <a href="https://github.com/elastic/elasticsearch/blob/a8cf4d6006c912af97c1407ff0406bc4a9a9659c/libs/core/src/main/java/org/elasticsearch/core/CharArrays.java#L20">...</a>
+     *
+     * @param chars The char array to encode to UTF-8.
+     * @return The UTF-8 encoded byte array.
      */
     public static byte[] toUtf8Bytes(char[] chars) {
         final CharBuffer charBuffer = CharBuffer.wrap(chars);

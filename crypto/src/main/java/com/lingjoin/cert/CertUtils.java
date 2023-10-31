@@ -34,11 +34,20 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * parse and generate RSA Cert
+ */
+@SuppressWarnings("unused")
 public class CertUtils {
     private static final BouncyCastleProvider BC_PROV = new BouncyCastleProvider();
     private static final int SERIAL_BIT_LENGTH = 20 * 8;
 
 
+    /**
+     * Generate RAS key pair.
+     *
+     * @return the key pair
+     */
     public static KeyPair generateRSAPair() {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -60,7 +69,11 @@ public class CertUtils {
      * @param caCert             ca证书
      * @param keyPair            服务端证书
      * @param days               有效日期
-     * @return 签名证书
+     * @return 签名证书 x 509 certificate
+     * @throws NoSuchAlgorithmException  the no such algorithm exception
+     * @throws OperatorCreationException the operator creation exception
+     * @throws CertificateException      the certificate exception
+     * @throws CertIOException           the cert io exception
      */
     public static X509Certificate generateSignedCertificate(
             final X500Principal principal,
@@ -134,6 +147,8 @@ public class CertUtils {
 
     /**
      * 生成证书的随机序列
+     *
+     * @return the serial
      */
     public static BigInteger getSerial() {
         SecureRandom random = new SecureRandom();
@@ -141,27 +156,27 @@ public class CertUtils {
     }
 
     private static String getDefaultSignatureAlgorithm(PrivateKey key) {
-        String signatureAlgorithm;
-        switch (key.getAlgorithm()) {
-            case "RSA":
-                signatureAlgorithm = "SHA256withRSA";
-                break;
-            case "DSA":
-                signatureAlgorithm = "SHA256withDSA";
-                break;
-            case "EC":
-                signatureAlgorithm = "SHA256withECDSA";
-                break;
-            default:
-                throw new IllegalArgumentException(
-                        "Unsupported algorithm : "
-                                + key.getAlgorithm()
-                                + " for signature, allowed values for private key algorithm are [RSA, DSA, EC]"
-                );
-        }
-        return signatureAlgorithm;
+        return switch (key.getAlgorithm()) {
+            case "RSA" -> "SHA256withRSA";
+            case "DSA" -> "SHA256withDSA";
+            case "EC" -> "SHA256withECDSA";
+            default -> throw new IllegalArgumentException(
+                    "Unsupported algorithm : "
+                            + key.getAlgorithm()
+                            + " for signature, allowed values for private key algorithm are [RSA, DSA, EC]"
+            );
+        };
     }
 
+    /**
+     * Saves the certificate and private key to an output stream in a zip file format.
+     *
+     * @param  outputStream   the output stream to write the zip file to
+     * @param  certificate     the X509 certificate to save
+     * @param  privateKey      the private key to save
+     * @param  password        the password to encrypt the private key (optional)
+     * @param  caPath         the path to the CA certificate file
+     */
     public static void saveCertAndKey(
             OutputStream outputStream,
             X509Certificate certificate,
@@ -200,6 +215,13 @@ public class CertUtils {
         }
     }
 
+    /**
+     * Read x 509 certificate x 509 certificate.
+     *
+     * @param input the input
+     * @return the x 509 certificate
+     * @throws Exception the exception
+     */
     public static X509Certificate readX509Certificate(InputStream input) throws Exception {
         CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
         return (X509Certificate) certFactory.generateCertificate(input);

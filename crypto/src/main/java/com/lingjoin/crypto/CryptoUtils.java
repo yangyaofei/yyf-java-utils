@@ -1,4 +1,4 @@
-package com.lingjoin.cryptoutils;
+package com.lingjoin.crypto;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;

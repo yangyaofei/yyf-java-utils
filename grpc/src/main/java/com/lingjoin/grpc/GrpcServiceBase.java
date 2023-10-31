@@ -12,22 +12,48 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 abstract public class GrpcServiceBase {
+    /**
+     * The Grpc config.
+     */
     protected final GrpcConfig grpcConfig;
+    /**
+     * The Credentials for the channel.
+     */
     protected final ChannelCredentials credentials;
 
+    /**
+     * The Channel map to store the channel for each endpoint
+     */
     protected final Map<String, ManagedChannel> channelMap;
 
-    @SuppressWarnings("MissingJavadoc")
-    public GrpcServiceBase(GrpcConfig grpcConfig) throws IOException {
+    /**
+     * @param grpcConfig the grpc config
+     * @throws IOException the io exception
+     */
+    protected GrpcServiceBase(GrpcConfig grpcConfig) throws IOException {
         this.grpcConfig = grpcConfig;
         this.credentials = generateCredentials();
         this.channelMap = new HashMap<>();
     }
 
+    /**
+     * Generates a key for a gRPC channel based on the provided endpoint.
+     *
+     * @param endpoint The endpoint to generate the key for.
+     * @return The generated channel key.
+     */
     protected String generateChannelKey(GrpcEndpoint endpoint) {
         return endpoint.getHost() + ":" + endpoint.getPort();
     }
 
+    /**
+     * Retrieves a gRPC channel for the provided endpoint. If a channel for the endpoint already exists,
+     * it checks if the channel is shutdown or terminated. If so, it shuts down the existing channel and
+     * generates a new channel. If the channel is not shutdown or terminated, it returns the existing channel.
+     *
+     * @param endpoint The endpoint to retrieve the channel for.
+     * @return The gRPC channel for the endpoint.
+     */
     protected ManagedChannel getChannel(GrpcEndpoint endpoint) {
         String channelKey = this.generateChannelKey(endpoint);
         if (!channelMap.containsKey(channelKey)) {

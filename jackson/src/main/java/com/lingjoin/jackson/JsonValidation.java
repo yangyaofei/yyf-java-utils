@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * 验证 JSON 是否合法, 并返回 JSON 错误的位置
@@ -23,41 +21,20 @@ public class JsonValidation {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.readValue(jsonStr, clazz);
-            return new ValidationResult(true);
+            return new ValidationResult(true, 0, 0, null);
         } catch (JsonParseException | JsonMappingException e) {
             int lineNumber = e.getLocation().getLineNr();
             int columnNumber = e.getLocation().getColumnNr();
             String message = e.getOriginalMessage();
             return new ValidationResult(false, lineNumber, columnNumber, message);
         } catch (Exception e) {
-            return new ValidationResult(false, e.getMessage());
+            return new ValidationResult(false, 0, 0, e.getMessage());
         }
     }
 
     /**
      * 验证 JSON 合法性结果
      */
-    @Getter
-    @ToString
-    public static class ValidationResult {
-        final private boolean isValid;
-        final private int lineNumber;
-        final private int columnNumber;
-        final private String message;
-
-        protected ValidationResult(boolean isValid) {
-            this(isValid, 0, 0, null);
-        }
-
-        protected ValidationResult(boolean isValid, String message) {
-            this(isValid, 0, 0, message);
-        }
-
-        protected ValidationResult(boolean isValid, int lineNumber, int columnNumber, String message) {
-            this.isValid = isValid;
-            this.lineNumber = lineNumber;
-            this.columnNumber = columnNumber;
-            this.message = message;
-        }
+    public record ValidationResult(boolean isValid, int lineNumber, int columnNumber, String message) {
     }
 }
