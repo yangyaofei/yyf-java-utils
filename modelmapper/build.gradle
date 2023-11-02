@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation 'org.modelmapper:modelmapper:3.1.1'
-    implementation 'org.modelmapper:modelmapper-module-record:1.0.0'
-    implementation 'com.google.guava:guava:32.1.2-jre'
+    implementation "org.modelmapper:modelmapper:${Versions.modelMapperVersion}"
+    implementation "org.modelmapper:modelmapper-module-record:${Versions.modelMapperModuleRecordVersion}"
+    implementation "com.google.guava:guava:${Versions.googleGuava}"
 }

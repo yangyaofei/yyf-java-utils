@@ -1,6 +1,7 @@
 plugins {
     id 'idea'
     id 'java'
+    id 'java-library'
     // for lombok
     id "io.freefair.lombok"
     id 'maven-publish'
@@ -9,7 +10,7 @@ plugins {
 
 allprojects {
     group = 'com.lingjoin'
-    version = '0.2.3'
+    version = '0.2.3.1'
 }
 
 publishing {
@@ -19,6 +20,11 @@ publishing {
             artifactId = "${rootProject.getName()}-${project.getName()}"
             version = version
             from components.java
+            versionMapping {
+                usage("java-runtime") {
+                    fromResolutionResult()
+                }
+            }
         }
     }
     repositories {
