@@ -1,9 +1,9 @@
 class Versions {
     // NLPIR versions
-    static final String nlpirPlatformUtilsVersion = "0.2.3.1bbb"
+    static final String nlpirPlatformUtilsVersion = "0.2.3.1"
     static final String nlpirClientJavaVersion = "0.5.8.1-beta"
     static final String nlpirDocumentUtils = "0.4.9-beta"
-    static final String nlpirAuthorizationVServerVersion = "0.1.5"
+    static final String nlpirAuthorizationVServerVersion = "0.1.5.1"
 
     // apache commons
     static final String commonsLangVersion = "3.12.0" // for non-spring project
