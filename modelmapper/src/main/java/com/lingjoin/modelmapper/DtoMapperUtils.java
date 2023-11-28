@@ -25,6 +25,7 @@ public class DtoMapperUtils {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.registerModule(new RecordModule())
                 .getConfiguration()
+                .setCollectionsMergeEnabled(false)
                 .setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper;
     }
@@ -38,6 +39,7 @@ public class DtoMapperUtils {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.registerModule(new RecordModule())
                 .getConfiguration()
+                .setCollectionsMergeEnabled(false)
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setPropertyCondition(Conditions.isNotNull());
         return modelMapper;
