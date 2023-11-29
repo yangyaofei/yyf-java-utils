@@ -17,6 +17,9 @@ class Versions {
     static final String grpcVersion = "1.55.1"
     static final String protobufVersion = "3.22.2"
 
+    //test
+    static final String junitVersion = "5.10.1"
+
     // other versions
     static final String minioVersion = "8.5.2"
     static final String dockerJavaVersion = "3.3.0"

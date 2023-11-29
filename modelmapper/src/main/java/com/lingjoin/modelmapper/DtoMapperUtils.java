@@ -79,6 +79,15 @@ public class DtoMapperUtils {
      * @param <Entity> DTO 对应的 Entity 类型
      */
     public interface DtoMapperInterface<Entity> {
+
+        /**
+         * 实现自定义的 ModelMapper, 默认此函数返回空, 若非空则 map 函数使用此接口
+         *
+         * @return modelMapper
+         */
+        default ModelMapper getModelMapper() {
+            return null;
+        }
         /**
          * 默认的转换方式, 不排除 null 值.
          *
@@ -87,7 +96,11 @@ public class DtoMapperUtils {
         default Entity map() {
             TypeToken<Entity> typeToken = new TypeToken<>(getClass()) {
             };
-            return defaultModelMapper.map(this, typeToken.getType());
+            ModelMapper modelMapper = getModelMapper();
+            if (modelMapper == null) {
+                modelMapper = defaultModelMapper;
+            }
+            return modelMapper.map(this, typeToken.getType());
         }
 
         /**
@@ -97,7 +110,11 @@ public class DtoMapperUtils {
          * @return entity
          */
         default Entity map(Entity entity) {
-            copyNonnullModelMapper.map(this, entity);
+            ModelMapper modelMapper = getModelMapper();
+            if (modelMapper == null) {
+                modelMapper = copyNonnullModelMapper;
+            }
+            modelMapper.map(this, entity);
             return entity;
         }
 
