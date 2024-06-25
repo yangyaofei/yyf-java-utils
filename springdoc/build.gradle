@@ -1,0 +1,18 @@
+plugins {
+    id 'java-conventions'
+    id 'spring-dependency-conventions'
+}
+dependencies {
+    // online doc
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${Versions.springdocVersion}"
+    // generate java doc
+    annotationProcessor "com.github.therapi:therapi-runtime-javadoc-scribe:${Versions.therapiRuntimeJavadocVersion}"
+    implementation "com.github.therapi:therapi-runtime-javadoc:${Versions.therapiRuntimeJavadocVersion}"
+    // javadoc markdown to html
+    implementation "org.commonmark:commonmark:${Versions.commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-gfm-tables:${Versions.commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-gfm-strikethrough:${Versions.commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-ins:${Versions.commonmarkVersion}"
+    implementation "org.commonmark:commonmark-ext-task-list-items:${Versions.commonmarkVersion}"
+
+}

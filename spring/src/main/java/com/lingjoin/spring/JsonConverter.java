@@ -46,6 +46,9 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
     @Override
     @SuppressWarnings("unchecked")
     public T convertToEntityAttribute(String data) {
+        if (data == null) {
+            return null;
+        }
         Type type = this.getGenericsType();
         JavaType javaType = objectMapper.constructType(type);
         Object value = objectMapper.readValue(data, javaType);

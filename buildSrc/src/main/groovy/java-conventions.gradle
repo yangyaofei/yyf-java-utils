@@ -10,7 +10,7 @@ plugins {
 
 allprojects {
     group = 'com.lingjoin'
-    version = '0.2.4'
+    version = '0.2.5'
 }
 
 publishing {
@@ -47,7 +47,7 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
-def lombokVersion = '1.18.26'
+def lombokVersion = '1.18.32'
 
 dependencies {
     // lombok
@@ -73,9 +73,7 @@ java {
     withJavadocJar()
 }
 
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-    }
+idea.module {
+    downloadJavadoc = true
+    downloadSources = true
 }

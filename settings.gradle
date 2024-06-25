@@ -5,3 +5,5 @@ include 'modelmapper'
 include 'build-conventions'
 include 'spring'
 include 'crypto'
+include 'springdoc'
+
