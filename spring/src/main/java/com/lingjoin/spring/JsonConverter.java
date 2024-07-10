@@ -32,6 +32,9 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
     @SneakyThrows
     @Override
     public String convertToDatabaseColumn(T attribute) {
+        if (attribute == null) {
+            return null;
+        }
         // 使用 T 获取的类型 并使用 objectWriter 进行转换, 可以避免 T 为 Collection 等类型时候
         // 由于 type erasure 导致的序列化的时候一个设定消失
         // 具体例子可以见 chatbit-backend 中的 ChatMessage 中的 Message, 使用 Custom JsonTypeIdResolver 的情况
