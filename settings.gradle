@@ -7,4 +7,5 @@ include 'spring'
 include 'crypto'
 include 'springdoc'
 include 'querydsl'
+include 'exception'
 
