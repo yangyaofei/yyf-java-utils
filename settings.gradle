@@ -6,4 +6,5 @@ include 'build-conventions'
 include 'spring'
 include 'crypto'
 include 'springdoc'
+include 'querydsl'
 

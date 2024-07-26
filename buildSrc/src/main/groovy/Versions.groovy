@@ -1,10 +1,10 @@
 class Versions {
     // NLPIR versions
-    static final String nlpirPlatformVersion = "0.5.3"
-    static final String nlpirPlatformUtilsVersion = "0.2.4"
+    static final String nlpirPlatformVersion = "0.5.8"
+    static final String nlpirPlatformUtilsVersion = "0.2.7"
     static final String nlpirClientJavaVersion = "0.5.8.1-beta"
     static final String nlpirDocumentUtils = "0.4.9-beta"
-    static final String nlpirAuthorizationVServerVersion = "0.1.5.8"
+    static final String nlpirAuthorizationVServerVersion = "0.2.2"
     static final String chatBitVersion = "0.2.0"
 
     // apache commons
@@ -28,6 +28,7 @@ class Versions {
 
     // query dsl
     static final String queryDslVersion = "5.1.0"
+    static final String rsqlVersion = "6.0.22"
 
     static final String lombokVersion = '1.18.32'
 
