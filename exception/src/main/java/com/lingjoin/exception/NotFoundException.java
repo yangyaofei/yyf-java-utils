@@ -17,4 +17,20 @@ public class NotFoundException extends ResponseStatusException {
     public NotFoundException(String reason, Throwable cause) {
         super(NOT_FOUND, reason, cause);
     }
+
+    /**
+     * Instantiates a new Not found exception.
+     *
+     * @param reason the reason
+     */
+    public NotFoundException(String reason) {
+        this(reason, null);
+    }
+
+    /**
+     * Instantiates a new Not found exception.
+     */
+    public NotFoundException() {
+        this("", null);
+    }
 }
