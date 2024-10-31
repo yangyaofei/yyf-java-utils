@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 用于实体类的序列化和反序列化的 TypeResolver , id被存储成相对于 Base Class 的包名的相对路径
@@ -20,16 +19,31 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class RelativeTypeResolver extends TypeIdResolverBase {
     private final static Map<String, JavaType> basePackageMap = new HashMap<>();
+    // 用于存储已经进行 init 的 type 的 packageName, 缓存
+    private final static Set<String> typeSet = new HashSet<>();
 
     @Override
     public void init(JavaType baseType) {
+        updatePackageMap(baseType);
+    }
+
+    /**
+     * 更新 baseType 到 baseClass 路径上
+     *
+     * @param baseType type
+     */
+    public static void updatePackageMap(JavaType baseType) {
+        String packageName = baseType.getRawClass().getPackageName();
+        if (typeSet.contains(packageName)) {
+            return;
+        }
         Class<?> clazz = baseType.getRawClass();
         JavaType superClass = baseType.getSuperClass();
         while (!baseType.getRawClass().isAnnotationPresent(JsonTypeInfo.class)) {
             baseType = baseType.getSuperClass();
             Objects.requireNonNull(baseType, "序列化失败,找不到@JsonTypeInfo信息");
         }
-
+        typeSet.add(packageName);
         basePackageMap.put(baseType.getRawClass().getPackageName(), baseType);
     }
 
@@ -62,10 +76,32 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
 
     /**
      * 用于获取对应的类的Type值, 可用于构建对应的类
+     *
      * @param type Type class
      * @return TypeId
      */
-    public static String idFromType(Class<?> type){
+    public static String idFromType(Class<?> type) {
+        if (!typeSet.contains(type.getPackageName())) {
+            JavaType javaType = TypeFactory.defaultInstance().constructType(type);
+            updatePackageMap(javaType);
+        }
+        return idFromTypeInner(type);
+    }
+
+    /**
+     * 用于获取对应的类的Type值, 可用于构建对应的类
+     *
+     * @param type Type class
+     * @return TypeId
+     */
+    public static String idFromType(JavaType type) {
+        if (!typeSet.contains(type.getRawClass().getPackageName())) {
+            updatePackageMap(type);
+        }
+        return idFromTypeInner(type.getRawClass());
+    }
+
+    private static String idFromTypeInner(Class<?> type) {
         String clazzName = type.getName();
         for (var base : basePackageMap.entrySet()) {
             if (clazzName.startsWith(base.getKey())) {
