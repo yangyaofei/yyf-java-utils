@@ -40,14 +40,7 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
 
     @Override
     public String idFromValueAndType(Object value, Class<?> suggestedType) {
-        String clazzName = suggestedType.getName();
-        for (var base : basePackageMap.entrySet()) {
-            if (clazzName.startsWith(base.getKey())) {
-                return clazzName.substring(base.getKey().length());
-            }
-        }
-        // TODO generalize this exception
-        throw new RuntimeException("Object not in basePackage");
+        return idFromType(suggestedType);
     }
 
     @Override
@@ -64,6 +57,22 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
             }
         }
         // TODO more info in this exception
+        throw new RuntimeException("Object not in basePackage");
+    }
+
+    /**
+     * 用于获取对应的类的Type值, 可用于构建对应的类
+     * @param type Type class
+     * @return TypeId
+     */
+    public static String idFromType(Class<?> type){
+        String clazzName = type.getName();
+        for (var base : basePackageMap.entrySet()) {
+            if (clazzName.startsWith(base.getKey())) {
+                return clazzName.substring(base.getKey().length());
+            }
+        }
+        // TODO generalize this exception
         throw new RuntimeException("Object not in basePackage");
     }
 }
