@@ -75,6 +75,14 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
     }
 
     /**
+     * Get a copy of basePackageMap
+     * @return basePackageMap
+     */
+    public static Map<String, JavaType> getBasePackageMap() {
+        return Map.copyOf(basePackageMap);
+    }
+
+    /**
      * 用于获取对应的类的Type值, 可用于构建对应的类
      *
      * @param type Type class
