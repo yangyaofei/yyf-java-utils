@@ -1,5 +1,6 @@
 package com.lingjoin.spring;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -23,7 +24,7 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
     @SuppressWarnings("MissingJavadoc")
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper.copy().setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     private ObjectMapper objectMapper;
