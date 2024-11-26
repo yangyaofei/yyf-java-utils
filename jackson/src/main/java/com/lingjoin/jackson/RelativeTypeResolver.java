@@ -76,17 +76,35 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
 
     /**
      * Get a copy of basePackageMap
-     * @return basePackageMap
+     *
+     * @return basePackageMap base package map
      */
     public static Map<String, JavaType> getBasePackageMap() {
         return Map.copyOf(basePackageMap);
     }
 
     /**
+     * Gets class from typeId
+     *
+     * @param typeId the typeId
+     * @return the class
+     */
+    public static Class<?> getClass(String typeId) {
+        Class<?> clazz = null;
+        for (var base : getBasePackageMap().entrySet()) {
+            try {
+                return Class.forName(base.getKey() + typeId);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        throw new RuntimeException("Object not in basePackage");
+    }
+
+    /**
      * 用于获取对应的类的Type值, 可用于构建对应的类
      *
      * @param type Type class
-     * @return TypeId
+     * @return TypeId string
      */
     public static String idFromType(Class<?> type) {
         if (!typeSet.contains(type.getPackageName())) {
@@ -100,7 +118,7 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
      * 用于获取对应的类的Type值, 可用于构建对应的类
      *
      * @param type Type class
-     * @return TypeId
+     * @return TypeId string
      */
     public static String idFromType(JavaType type) {
         if (!typeSet.contains(type.getRawClass().getPackageName())) {
