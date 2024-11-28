@@ -85,7 +85,7 @@ public class DtoMapperUtils {
          *
          * @return modelMapper
          */
-        default ModelMapper getModelMapper() {
+        default ModelMapper modelMapper() {
             return null;
         }
         /**
@@ -96,7 +96,7 @@ public class DtoMapperUtils {
         default Entity map() {
             TypeToken<Entity> typeToken = new TypeToken<>(getClass()) {
             };
-            ModelMapper modelMapper = getModelMapper();
+            ModelMapper modelMapper = modelMapper();
             if (modelMapper == null) {
                 modelMapper = defaultModelMapper;
             }
@@ -110,7 +110,7 @@ public class DtoMapperUtils {
          * @return entity
          */
         default Entity map(Entity entity) {
-            ModelMapper modelMapper = getModelMapper();
+            ModelMapper modelMapper = modelMapper();
             if (modelMapper == null) {
                 modelMapper = copyNonnullModelMapper;
             }
