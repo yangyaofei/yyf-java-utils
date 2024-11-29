@@ -1,7 +1,7 @@
 class Versions {
     // NLPIR versions
     static final String nlpirPlatformVersion = "0.5.9"
-    static final String nlpirPlatformUtilsVersion = "0.2.10"
+    static final String nlpirPlatformUtilsVersion = "0.2.18"
     static final String nlpirClientJavaVersion = "0.5.8.1-beta"
     static final String nlpirDocumentUtils = "0.4.9-beta"
     static final String nlpirAuthorizationVServerVersion = "0.3.1"

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.SneakyThrows;
@@ -24,7 +25,26 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
     @SuppressWarnings("MissingJavadoc")
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper.copy().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        var config = this.getConfig();
+        this.objectMapper = objectMapper.copy();
+        if (config != null && config.excludeNull()) {
+            this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        }
+        if (config != null) {
+            var namingStrategy = switch (config.namingStrategy()) {
+                case DEFAULT -> null;
+                case LOWER_CAMEL_CASE -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
+                case UPPER_CAMEL_CASE -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
+                case SNAKE_CASE -> PropertyNamingStrategies.SNAKE_CASE;
+                case UPPER_SNAKE_CASE -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
+                case LOWER_CASE -> PropertyNamingStrategies.LOWER_CASE;
+                case KEBAB_CASE -> PropertyNamingStrategies.KEBAB_CASE;
+                case LOWER_DOT_CASE -> PropertyNamingStrategies.LOWER_DOT_CASE;
+            };
+            if (namingStrategy != null) {
+                this.objectMapper.setPropertyNamingStrategy(namingStrategy);
+            }
+        }
     }
 
     private ObjectMapper objectMapper;
@@ -79,5 +99,14 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
             type = ((Class) type).getGenericSuperclass();
         }
         return null;
+    }
+
+    /**
+     * Gets config from annotation
+     *
+     * @return the config
+     */
+    protected ConverterConfig getConfig() {
+        return this.getClass().getDeclaredAnnotation(ConverterConfig.class);
     }
 }
