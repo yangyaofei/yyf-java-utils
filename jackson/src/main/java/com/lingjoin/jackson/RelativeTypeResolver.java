@@ -54,7 +54,11 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
 
     @Override
     public String idFromValueAndType(Object value, Class<?> suggestedType) {
-        return idFromType(suggestedType);
+        try {
+            return idFromType(suggestedType);
+        } catch (ClassNotFoundException e) {
+            throw new ClassCannotResolveException("Cannot resolve " + suggestedType.getCanonicalName(), e);
+        }
     }
 
     @Override
@@ -70,8 +74,7 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
             } catch (ClassNotFoundException ignored) {
             }
         }
-        // TODO more info in this exception
-        throw new RuntimeException("Object not in basePackage");
+        throw new ClassCannotResolveException("typeId: " + type + " can not resolve");
     }
 
     /**
@@ -88,8 +91,9 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
      *
      * @param typeId the typeId
      * @return the class
+     * @throws ClassNotFoundException class not found exception
      */
-    public static Class<?> getClass(String typeId) {
+    public static Class<?> getClass(String typeId) throws ClassNotFoundException {
         Class<?> clazz = null;
         for (var base : getBasePackageMap().entrySet()) {
             try {
@@ -97,7 +101,7 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
             } catch (ClassNotFoundException ignored) {
             }
         }
-        throw new RuntimeException("Object not in basePackage");
+        throw new ClassNotFoundException("typeId: " + typeId + " can not resolve");
     }
 
     /**
@@ -105,8 +109,9 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
      *
      * @param type Type class
      * @return TypeId string
+     * @throws ClassNotFoundException class not found exception
      */
-    public static String idFromType(Class<?> type) {
+    public static String idFromType(Class<?> type) throws ClassNotFoundException {
         if (!typeSet.contains(type.getPackageName())) {
             JavaType javaType = TypeFactory.defaultInstance().constructType(type);
             updatePackageMap(javaType);
@@ -119,23 +124,49 @@ public class RelativeTypeResolver extends TypeIdResolverBase {
      *
      * @param type Type class
      * @return TypeId string
+     * @throws ClassNotFoundException class not found exception
      */
-    public static String idFromType(JavaType type) {
+    public static String idFromType(JavaType type) throws ClassNotFoundException {
         if (!typeSet.contains(type.getRawClass().getPackageName())) {
             updatePackageMap(type);
         }
         return idFromTypeInner(type.getRawClass());
     }
 
-    private static String idFromTypeInner(Class<?> type) {
+    private static String idFromTypeInner(Class<?> type) throws ClassNotFoundException {
         String clazzName = type.getName();
         for (var base : basePackageMap.entrySet()) {
             if (clazzName.startsWith(base.getKey())) {
                 return clazzName.substring(base.getKey().length());
             }
         }
-        // TODO generalize this exception
-        throw new RuntimeException("Object not in basePackage");
+        throw new ClassNotFoundException("Class: " + type.getCanonicalName() + " not in base packages", null);
+
     }
+
+    /**
+     * exception raised when {@link RelativeTypeResolver} cannot resolve the type to class vers visa
+     */
+    static public class ClassCannotResolveException extends RuntimeException {
+        /**
+         * Instantiates a new Class cannot resolve exception.
+         *
+         * @param message the message
+         */
+        protected ClassCannotResolveException(String message) {
+            super(message);
+        }
+
+        /**
+         * Instantiates a new Class cannot resolve exception.
+         *
+         * @param message the message
+         * @param cause   the cause
+         */
+        protected ClassCannotResolveException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
 }
 
