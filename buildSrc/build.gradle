@@ -3,6 +3,7 @@ plugins {
     id 'java-gradle-plugin'
 }
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
     gradlePluginPortal()
 }
 dependencies {
