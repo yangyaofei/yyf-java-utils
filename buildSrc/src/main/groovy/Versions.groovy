@@ -1,10 +1,10 @@
 class Versions {
     // NLPIR versions
-    static final String nlpirPlatformVersion = "0.5.9"
-    static final String nlpirPlatformUtilsVersion = "0.2.18"
+    static final String nlpirPlatformVersion = "0.5.16"
+    static final String nlpirPlatformUtilsVersion = "0.2.20"
     static final String nlpirClientJavaVersion = "0.5.8.1-beta"
     static final String nlpirDocumentUtils = "0.4.9-beta"
-    static final String nlpirAuthorizationVServerVersion = "0.3.1"
+    static final String nlpirAuthorizationVServerVersion = "0.3.14b1"
     static final String chatBitVersion = "0.2.0"
 
     // apache commons
@@ -23,8 +23,8 @@ class Versions {
     static final String junitVersion = "5.10.1"
 
     // spring
-    static final String springBootVersion = "3.3.2"
-    static final String springDependencyManagementPluginVersion = "1.1.6"
+    static final String springBootVersion = "3.4.1"
+    static final String springDependencyManagementPluginVersion = "1.1.7"
 
     // query dsl
     static final String queryDslVersion = "5.1.0"
@@ -32,8 +32,10 @@ class Versions {
 
     static final String lombokVersion = '1.18.32'
 
+    static final String okhttp3Version = '4.12.0'
+
     // gradle plugins
-    static final String lombokPluginVersion = "8.6"
+    static final String lombokPluginVersion = "8.11"
     static final String protobufPluginVersion = "0.9.4"
     // other versions
     static final String minioVersion = "8.5.2"
